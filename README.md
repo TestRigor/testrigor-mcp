@@ -4,7 +4,7 @@ Connect AI assistants to [testRigor](https://testrigor.com) for managing test su
 
 ## Available Tools
 
-The testRigor MCP server provides 14 tools organized into four categories:
+The testRigor MCP server provides 38 tools organized into seven categories:
 
 ### Test Suite Management
 
@@ -20,6 +20,45 @@ The testRigor MCP server provides 14 tools organized into four categories:
 | `list_test_cases` | List test cases in a suite (paginated). Supports filtering by label or searching by description | `testSuiteId`, `label`?, `search`?, `page`?, `pageSize`? |
 | `get_test_case` | Get a single test case with its full steps | `testSuiteId`, `testCaseUuid` |
 | `list_test_case_runs` | List recent run history for a specific test case (most recent first). Returns status, timing, and `flowUuid` for each run | `testSuiteId`, `testCaseUuid`, `page`?, `pageSize`? |
+| `update_test_case_dataset` | Set (or change) which data set an existing test case uses | `testSuiteId`, `testCaseUuid`, `datasetId` |
+
+### Global Variables
+
+| Tool | Description | Key Parameters |
+|------|-------------|----------------|
+| `list_global_variables` | List global variables in a suite (paginated). Also called "Test Data" in the testRigor UI. Optionally filter to variables referenced by one test case | `testSuiteId`, `testCaseUuid`?, `page`?, `pageSize`? |
+| `get_global_variable` | Get a single global variable by key | `testSuiteId`, `key` |
+| `create_global_variable` | Create a new global variable in a suite | `testSuiteId`, `key`, `value`, `path`?, `type` |
+| `update_global_variable_value` | Replace the value of an existing global variable, by key | `testSuiteId`, `key`, `value`, `path`? |
+| `get_file_upload_url` | Get a one-time URL to upload a file to, for use as a FILE-type global variable or data set value | `testSuiteId`, `fileName` |
+| `create_certificate_global_variable` | Create a CLIENT_CERTIFICATE-type global variable from a .pfx certificate's content, base64-encoded | `testSuiteId`, `key`, `fileName`, `certBase64`, `password` |
+| `update_certificate_global_variable` | Replace an existing CLIENT_CERTIFICATE-type global variable's certificate | `testSuiteId`, `key`, `fileName`, `certBase64`, `password` |
+
+### Data Sets
+
+| Tool | Description | Key Parameters |
+|------|-------------|----------------|
+| `list_data_sets` | List data sets in a suite (paginated summaries: schema and row count, no row values) | `testSuiteId`, `page`?, `pageSize`? |
+| `get_data_set` | Get a data set's full schema and row values | `testSuiteId`, `datasetId` |
+| `create_data_set` | Create a new data set with optional variables and rows | `testSuiteId`, `name`, `description`?, `variables`?, `rows`? |
+| `add_data_set_rows` | Add new rows to an existing data set | `testSuiteId`, `datasetId`, `rows` |
+| `update_data_set_rows` | Update existing rows in a data set, by row id | `testSuiteId`, `datasetId`, `rows` |
+| `add_data_set_variable` | Add a new variable (column) to an existing data set, with a value for every existing row | `testSuiteId`, `datasetId`, `name`, `type`, `existingRowValues` |
+
+### Reusable Rules
+
+| Tool | Description | Key Parameters |
+|------|-------------|----------------|
+| `list_rules` | List reusable rules in a suite (paginated), or all rules used by a specific test case | `testSuiteId`, `testCaseUuid`?, `page`?, `pageSize`? |
+| `get_rule` | Get a single reusable rule by name | `testSuiteId`, `name` |
+| `create_rule` | Create a new reusable rule, optionally inside a folder | `testSuiteId`, `name`, `steps`, `labels`?, `precondition`?, `parentFolderId`? |
+| `update_rule_steps` | Replace the steps of an existing reusable rule | `testSuiteId`, `name`, `steps` |
+| `list_rule_folders` | List rule folders in a suite, optionally under a parent folder or filtered by name | `testSuiteId`, `parentFolderId`?, `nameFilter`? |
+| `create_rule_folder` | Create a new rule folder, optionally inside a parent folder | `testSuiteId`, `name`, `parentFolderId`? |
+| `rename_rule_folder` | Rename an existing rule folder | `testSuiteId`, `folderId`, `newName` |
+| `move_rule_folder` | Move a rule folder to a new parent folder (or to the root) | `testSuiteId`, `folderId`, `newParentFolderId`? |
+| `delete_rule_folder` | Delete an empty rule folder | `testSuiteId`, `folderId` |
+| `move_rule` | Move a reusable rule to a different folder (or to the root) | `testSuiteId`, `name`, `newFolderId`? |
 
 ### Test Execution
 
@@ -99,7 +138,7 @@ You need a **Personal Access Token (PAT)** to authenticate with the MCP server.
 ```
 
 4. Save — Cursor will automatically connect to the server
-5. You should see **testrigor** listed with a green indicator and 14 tools available
+5. You should see **testrigor** listed with a green indicator and 38 tools available
 
 ### Claude Code (CLI)
 
@@ -189,6 +228,17 @@ Once connected, you can interact with testRigor using natural language. Your AI 
 - *"Cancel the running task"*
 - *"What's the status of the current run?"*
 
+### Managing Global Variables and Data Sets
+
+- *"What's the value of the `apiBaseUrl` global variable in this suite?"*
+- *"Upload this image and save it as a FILE-type global variable called `logo`"*
+- *"Create a simple data set with a couple of test values and link it to a test case so it pulls its input from there instead of hardcoded values"*
+
+### Managing Reusable Rules
+
+- *"Two test cases both start with the same setup step — extract it into a rule and update both test cases to call it instead of repeating the line"*
+- *"Organize my rules into folders by feature area"*
+
 ## `server.json`
 
 For MCP server registries and discovery:
@@ -198,7 +248,7 @@ For MCP server registries and discovery:
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.testrigor/mcp-server",
   "description": "Manage test suites, run tests, view results, and automate QA workflows via AI with testRigor.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "remotes": [
     {
       "type": "streamable-http",
