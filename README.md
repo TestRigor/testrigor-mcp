@@ -4,7 +4,7 @@ Connect AI assistants to [testRigor](https://testrigor.com) for managing test su
 
 ## Available Tools
 
-The testRigor MCP server provides 38 tools organized into seven categories:
+The testRigor MCP server provides 49 tools organized into seven categories:
 
 ### Test Suite Management
 
@@ -33,6 +33,8 @@ The testRigor MCP server provides 38 tools organized into seven categories:
 | `get_file_upload_url` | Get a one-time URL to upload a file to, for use as a FILE-type global variable or data set value | `testSuiteId`, `fileName` |
 | `create_certificate_global_variable` | Create a CLIENT_CERTIFICATE-type global variable from a .pfx certificate's content, base64-encoded | `testSuiteId`, `key`, `fileName`, `certBase64`, `password` |
 | `update_certificate_global_variable` | Replace an existing CLIENT_CERTIFICATE-type global variable's certificate | `testSuiteId`, `key`, `fileName`, `certBase64`, `password` |
+| `rename_global_variable` | Rename a global variable, by key. Rejected by default if referenced by a test case or rule; pass `renameMode` to update every reference automatically or to rename anyway and break them | `testSuiteId`, `key`, `newKey`, `renameMode`? |
+| `delete_global_variable` | Delete a global variable, by key. Rejected by default if still referenced by a test case or rule; pass `deletionMode` to delete anyway | `testSuiteId`, `key`, `deletionMode`? |
 
 ### Data Sets
 
@@ -44,6 +46,12 @@ The testRigor MCP server provides 38 tools organized into seven categories:
 | `add_data_set_rows` | Add new rows to an existing data set | `testSuiteId`, `datasetId`, `rows` |
 | `update_data_set_rows` | Update existing rows in a data set, by row id | `testSuiteId`, `datasetId`, `rows` |
 | `add_data_set_variable` | Add a new variable (column) to an existing data set, with a value for every existing row | `testSuiteId`, `datasetId`, `name`, `type`, `existingRowValues` |
+| `update_data_set` | Rename a data set and/or update its description | `testSuiteId`, `datasetId`, `name`?, `description`? |
+| `delete_data_set_rows` | Delete one or more rows from a data set, by row id | `testSuiteId`, `datasetId`, `rowIds` |
+| `rename_data_set_variable` | Rename a variable (column) on a data set. Rejected by default if referenced by a test case or rule; pass `renameMode` to update every reference automatically or to rename anyway and break them | `testSuiteId`, `datasetId`, `name`, `newName`, `renameMode`? |
+| `delete_data_set_variable` | Delete a variable (column) from a data set, along with its values on every row. Rejected by default if still referenced by a test case or rule; pass `deletionMode` to delete anyway | `testSuiteId`, `datasetId`, `name`, `deletionMode`? |
+| `delete_data_set` | Delete a data set. Rejected by default if linked to any test case; pass `deletionMode` to unlink every linked test case and delete in one call | `testSuiteId`, `datasetId`, `deletionMode`? |
+| `unlink_data_set_from_test_case` | Remove a data set's link from a test case without deleting the data set itself | `testSuiteId`, `testCaseUuid`, `datasetId`? |
 
 ### Reusable Rules
 
@@ -53,7 +61,10 @@ The testRigor MCP server provides 38 tools organized into seven categories:
 | `get_rule` | Get a single reusable rule by name | `testSuiteId`, `name` |
 | `create_rule` | Create a new reusable rule, optionally inside a folder | `testSuiteId`, `name`, `steps`, `labels`?, `precondition`?, `parentFolderId`? |
 | `update_rule_steps` | Replace the steps of an existing reusable rule | `testSuiteId`, `name`, `steps` |
+| `rename_rule` | Rename a reusable rule. Rejected by default if referenced by a test case or another rule; pass `renameMode` to update every reference automatically or to rename anyway and break them | `testSuiteId`, `name`, `newName`, `renameMode`? |
+| `delete_rule` | Delete a reusable rule, by name. Rejected by default if referenced by a test case or another rule; pass `deletionMode` to delete anyway | `testSuiteId`, `name`, `deletionMode`? |
 | `list_rule_folders` | List rule folders in a suite, optionally under a parent folder or filtered by name | `testSuiteId`, `parentFolderId`?, `nameFilter`? |
+| `get_rule_folder` | Get a single rule folder's details, by folder id | `testSuiteId`, `folderId` |
 | `create_rule_folder` | Create a new rule folder, optionally inside a parent folder | `testSuiteId`, `name`, `parentFolderId`? |
 | `rename_rule_folder` | Rename an existing rule folder | `testSuiteId`, `folderId`, `newName` |
 | `move_rule_folder` | Move a rule folder to a new parent folder (or to the root) | `testSuiteId`, `folderId`, `newParentFolderId`? |
